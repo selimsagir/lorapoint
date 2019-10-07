@@ -1,0 +1,4 @@
+hw_spi.c:88:6:HW_SPI_Init	32	static
+hw_spi.c:140:6:HW_SPI_DeInit	32	static
+hw_spi.c:175:10:HW_SPI_InOut	32	static
+hw_spi.c:186:17:SpiFrequency	32	static

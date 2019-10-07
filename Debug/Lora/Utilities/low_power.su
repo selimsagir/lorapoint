@@ -1,0 +1,4 @@
+low_power.c:73:6:LowPower_Disable	32	static
+low_power.c:89:6:LowPower_Enable	32	static
+low_power.c:106:10:LowPower_GetState	8	static
+low_power.c:117:6:LowPower_Handler	8	static

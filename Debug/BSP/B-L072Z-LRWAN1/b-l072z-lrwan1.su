@@ -1,0 +1,8 @@
+core_cm0plus.h:804:22:NVIC_SetPriority	24	static
+b-l072z-lrwan1.c:110:10:BSP_GetVersion	8	static
+b-l072z-lrwan1.c:122:6:BSP_LED_Init	56	static
+b-l072z-lrwan1.c:145:6:BSP_LED_On	16	static
+b-l072z-lrwan1.c:157:6:BSP_LED_Off	16	static
+b-l072z-lrwan1.c:169:6:BSP_LED_Toggle	16	static
+b-l072z-lrwan1.c:185:6:BSP_PB_Init	40	static
+b-l072z-lrwan1.c:223:10:BSP_PB_GetState	16	static

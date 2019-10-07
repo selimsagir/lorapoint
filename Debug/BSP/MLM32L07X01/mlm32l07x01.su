@@ -1,0 +1,11 @@
+mlm32l07x01.c:113:6:SX1276IoInit	32	static
+mlm32l07x01.c:131:6:SX1276IoIrqInit	16	static
+mlm32l07x01.c:140:6:SX1276IoDeInit	32	static
+mlm32l07x01.c:153:6:SX1276SetRfTxPower	32	static
+mlm32l07x01.c:214:9:SX1276GetPaSelect	16	static
+mlm32l07x01.c:221:6:SX1276SetAntSwLowPower	16	static
+mlm32l07x01.c:250:13:SX1276AntSwInit	32	static
+mlm32l07x01.c:268:13:SX1276AntSwDeInit	32	static
+mlm32l07x01.c:287:6:SX1276SetAntSw	32	static
+mlm32l07x01.c:314:13:OnTcxoStopTimerEvent	8	static
+mlm32l07x01.c:323:6:SX1276CheckRfFrequency	16	static

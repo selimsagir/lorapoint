@@ -1,0 +1,5 @@
+stm32l0xx_hal_wwdg.c:174:19:HAL_WWDG_Init	16	static
+stm32l0xx_hal_wwdg.c:212:13:HAL_WWDG_MspInit	16	static
+stm32l0xx_hal_wwdg.c:248:19:HAL_WWDG_Refresh	16	static
+stm32l0xx_hal_wwdg.c:271:6:HAL_WWDG_IRQHandler	16	static
+stm32l0xx_hal_wwdg.c:295:13:HAL_WWDG_EarlyWakeupCallback	16	static
