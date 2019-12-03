@@ -37,7 +37,7 @@ int garbageRxDataCount = 0 ;
 /**
  * For Receive "RX" , For Transmit "TX"
  */
-#define RX
+#define TX
 
 #define BUFFER_SIZE   64 // Define the payload size here
 
