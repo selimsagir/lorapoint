@@ -6,3 +6,4 @@ mlm32l0xx_hal_msp.c:166:6:HAL_RTC_MspDeInit	16	static
 mlm32l0xx_hal_msp.c:178:6:HAL_RTC_AlarmAEventCallback	16	static
 mlm32l0xx_hal_msp.c:188:6:HAL_GPIO_EXTI_Callback	16	static
 mlm32l0xx_hal_msp.c:198:11:MSP_GetIRQn	16	static
+mlm32l0xx_hal_msp.c:228:6:HAL_I2C_MspInit	40	static

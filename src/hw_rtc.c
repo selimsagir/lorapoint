@@ -182,7 +182,7 @@ static void HW_RTC_SetAlarmConfig( void );
 
 static void HW_RTC_StartWakeUpAlarm( uint32_t timeoutValue );
 
-static TimerTime_t HW_RTC_GetCalendarValue(  RTC_DateTypeDef* RTC_DateStruct, RTC_TimeTypeDef* RTC_TimeStruct  );
+ TimerTime_t HW_RTC_GetCalendarValue(  RTC_DateTypeDef* RTC_DateStruct, RTC_TimeTypeDef* RTC_TimeStruct  );
 
 /* Exported functions ---------------------------------------------------------*/
 
@@ -378,10 +378,6 @@ uint32_t HW_RTC_GetTimerValue( void )
    * Find a way to pass RTC_TimeStruct to return.
    */
 
-  /*
-  RTC_TimeTypeDef *space = ( RTC_TimeTypeDef*)malloc(sizeof( RTC_TimeTypeDef));
-  memcpy(&space, &RTC_TimeStruct,sizeof(space)+1);
-*/
   return (CalendarValue);
 
 }
@@ -592,7 +588,7 @@ static void HW_RTC_StartWakeUpAlarm( uint32_t timeoutValue )
  * @param pointer to RTC_TimeStruct
  * @retval time in ticks
  */
-static TimerTime_t HW_RTC_GetCalendarValue( RTC_DateTypeDef* RTC_DateStruct, RTC_TimeTypeDef* RTC_TimeStruct )
+ TimerTime_t HW_RTC_GetCalendarValue( RTC_DateTypeDef* RTC_DateStruct, RTC_TimeTypeDef* RTC_TimeStruct )
 {
   TimerTime_t calendarValue = 0;
   uint32_t i = 0;

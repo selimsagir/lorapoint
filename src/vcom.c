@@ -63,7 +63,7 @@ __IO uint16_t iw=0;
 /* buffer read index*/
 static uint16_t ir=0;
 /* Uart Handle */
-static UART_HandleTypeDef UartHandle;
+UART_HandleTypeDef UartHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Functions Definition ------------------------------------------------------*/

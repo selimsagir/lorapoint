@@ -111,6 +111,7 @@ void HW_Init( void )
     HW_RTC_Init( );
     
     vcom_Init( );
+
     
     BSP_LED_Init( LED1 );
     

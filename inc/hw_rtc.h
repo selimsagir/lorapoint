@@ -74,6 +74,8 @@ Maintainer: Miguel Luis and Gregory Cristian
 /* Exported macros -----------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */ 
 
+TimerTime_t HW_RTC_GetCalendarValue( RTC_DateTypeDef* RTC_DateStruct, RTC_TimeTypeDef* RTC_TimeStruct );
+
 /*!
  * @brief Initializes the RTC timer
  * @note The timer is based on the RTC
@@ -114,7 +116,6 @@ uint32_t HW_RTC_GetTimerElapsedTime( void );
  * @retval none
  */
 uint32_t HW_RTC_GetTimerValue( void );
-
 /*!
  * @brief Set the RTC timer Reference
  * @retval  Timer Reference Value in  Ticks
@@ -169,6 +170,8 @@ uint32_t HW_RTC_ms2Tick( TimerTime_t timeMicroSec );
  * @retval returns time in timer milliseconds
  */
 TimerTime_t HW_RTC_Tick2ms( uint32_t tick );
+
+//TimerTime_t HW_RTC_GetCalendarValue( RTC_DateTypeDef* RTC_DateStruct, RTC_TimeTypeDef* RTC_TimeStruct );
 
 #ifdef __cplusplus
 }
