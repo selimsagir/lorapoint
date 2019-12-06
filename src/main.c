@@ -37,7 +37,7 @@ int garbageRxDataCount = 0 ;
 /**
  * For Receive "RX" , For Transmit "TX"
  */
-#define TX
+#define RX
 
 #define BUFFER_SIZE   64 // Define the payload size here
 
@@ -56,6 +56,11 @@ union tempframe{
 	}__attribute__((packed)) frame ;
 	unsigned char data[9];
 }dat;
+
+struct ms_packet{
+		uint32_t ms_s;
+		uint16_t sensor_s;
+}__attribute__((packed)) data_s;
 
 
 static void gpioCallback()
@@ -77,10 +82,23 @@ static void gpioCallback()
 	dat.frame.hour = time.Hours;
 	dat.frame.sensor = databuffer;
 
+	/*
+	 *  Send Milisecond data for plot ms-data figure
+	 */
+	/**
+	 *  Calculate ms
+	 */
+	/**
+	 *  subtract from 1000 because of subsec count reverse
+	 */
+	dat.frame.subsec = 1000 - dat.frame.subsec;
+	data_s.ms_s= dat.frame.hour * 3600000 + dat.frame.min * 60000 + dat.frame.sec * 1000 + dat.frame.subsec;
+	data_s.sensor_s = databuffer;
     if(databuffer < 4095)
 		{
-			Radio.Send((uint8_t*)&dat.data, (sizeof(dat.data)));
-			PRINTF("%d; %d; %d; %d;%d \n",dat.frame.hour,  dat.frame.min , dat.frame.sec, dat.frame.subsec, dat.frame.sensor);
+			Radio.Send((uint8_t*)&data_s, (sizeof(data_s)));
+//			PRINTF("%d; %d; %d; %d;%d \n",dat.frame.hour,  dat.frame.min , dat.frame.sec, dat.frame.subsec, dat.frame.sensor);
+			PRINTF("%d,%d \n",data_s.ms_s, dat.frame.sensor);
 		}
     else
     	{
@@ -105,7 +123,6 @@ void txDoneEventCallback()
 void rxDoneEventCallback(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 {
 	//BSP_LED_On(LED2);
-
 	  TimerStart(&ledTimer);
 	  RTC_TimeTypeDef time ;
 	  RTC_DateTypeDef date ;
@@ -120,16 +137,17 @@ void rxDoneEventCallback(uint8_t *payload, uint16_t size, int16_t rssi, int8_t s
 //			{
 //			vcom_Send("Second: %d Minute: %d Data: %d"  ,tStruct->Seconds, tStruct->Minutes, payload[0] +  (payload[1]<<8));
 //			struct Mpacket packetR;
-			dat.frame.subsec = Buffer[0] + ( Buffer[1] << 8 );
-			dat.frame.sec = Buffer[4];
-			dat.frame.min = Buffer[5];
-			dat.frame.hour = Buffer[6];
-			dat.frame.sensor = Buffer[7] + ( Buffer[8] << 8 );
-
-			vcom_Send("%d;%d;%d;%d;%d:\n", dat.frame.subsec, dat.frame.sec, dat.frame.min,
-															 dat.frame.hour, dat.frame.sensor);
-
-
+//			dat.frame.subsec = Buffer[0] + ( Buffer[1] << 8 );
+//			dat.frame.sec = Buffer[4];
+//			dat.frame.min = Buffer[5];
+//			dat.frame.hour = Buffer[6];
+//			dat.frame.sensor = Buffer[7] + ( Buffer[8] << 8 );
+//
+//			vcom_Send("%d;%d;%d;%d;%d:\n", dat.frame.subsec, dat.frame.sec, dat.frame.min,
+//															 dat.frame.hour, dat.frame.sensor);
+			data_s.ms_s = Buffer[0] | (Buffer[1] << 8) | (Buffer[2] << 16) | (Buffer[3] << 24);
+			data_s.sensor_s = Buffer[4] + (Buffer[5] << 8);
+			vcom_Send("%d,%d\n",dat.frame.subsec, dat.frame.sec, dat.frame.min, data_s.ms_s , data_s.sensor_s);
 }
 
 
