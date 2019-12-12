@@ -1,5 +1,5 @@
-main.c:66:13:gpioCallback	40	static
+main.c:67:13:gpioCallback	48	static
 main.c:111:13:ledTimerCallback	8	static
 main.c:116:6:txDoneEventCallback	8	static
-main.c:123:6:rxDoneEventCallback	56	static
-main.c:155:5:main	112	static
+main.c:124:6:rxDoneEventCallback	80	static
+main.c:165:5:main	112	static

@@ -30,9 +30,9 @@ int garbageRxDataCount = 0 ;
 
 #define LORA_FREQUENCY 868000000
 #define LORA_TX_POWER 14
-#define LORA_BANDWIDTH 2//0
+#define LORA_BANDWIDTH 2//0  [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved]
 #define LORA_DATARATE 7//10
-#define LORA_CODERATE 1
+#define LORA_CODERATE 1  // LoRa: [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8]
 #define LORA_PREAMBLE_LEN 8
 /**
  * For Receive "RX" , For Transmit "TX"
@@ -60,15 +60,16 @@ union tempframe{
 struct ms_packet{
 		uint32_t ms_s;
 		uint16_t sensor_s;
+		uint16_t packetCount;
 }__attribute__((packed)) data_s;
 
 
 static void gpioCallback()
 {
 //	//BSP_LED_On(LED3);
-//	uint32_t airtime = 0 ;
+	uint32_t airtime = 0 ;
 //	UNUSED(airtime);
-//    airtime = Radio.TimeOnAir(1, sizeof(databuffer));
+    airtime = Radio.TimeOnAir(1, sizeof(data_s));
 
     databuffer = HW_AdcReadChannel(ADC_CHANNEL_0);
 
@@ -86,11 +87,9 @@ static void gpioCallback()
 	 *  Send Milisecond data for plot ms-data figure
 	 */
 	/**
-	 *  Calculate ms
+	 *  Calculate ms, subtract from 1000 because of subsec count reverse
 	 */
-	/**
-	 *  subtract from 1000 because of subsec count reverse
-	 */
+	data_s.packetCount++;
 	dat.frame.subsec = 1000 - dat.frame.subsec;
 	data_s.ms_s= dat.frame.hour * 3600000 + dat.frame.min * 60000 + dat.frame.sec * 1000 + dat.frame.subsec;
 	data_s.sensor_s = databuffer;
@@ -98,7 +97,8 @@ static void gpioCallback()
 		{
 			Radio.Send((uint8_t*)&data_s, (sizeof(data_s)));
 //			PRINTF("%d; %d; %d; %d;%d \n",dat.frame.hour,  dat.frame.min , dat.frame.sec, dat.frame.subsec, dat.frame.sensor);
-			PRINTF("%d,%d \n",data_s.ms_s, dat.frame.sensor);
+			PRINTF("[%d]%d;%d\n",data_s.packetCount, data_s.ms_s, dat.frame.sensor);
+
 		}
     else
     	{
@@ -116,19 +116,20 @@ static void ledTimerCallback()
 void txDoneEventCallback()
 {
 //	BSP_LED_Off(LED3);
-    Radio.Rx(0);
+//    Radio.Rx(0);
+	__NOP();
 }
 
 
 void rxDoneEventCallback(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 {
-	//BSP_LED_On(LED2);
+	  //BSP_LED_On(LED2);
 	  TimerStart(&ledTimer);
 	  RTC_TimeTypeDef time ;
 	  RTC_DateTypeDef date ;
 	  HW_RTC_GetCalendarValue( &date , &time );
 	  memcpy(Buffer,payload, (BUFFER_SIZE));
-
+	  databuffer = HW_AdcReadChannel(ADC_CHANNEL_0);
 //		if( (payload[7] + (payload[1]<<8)) > 4095 )  // Only 1 and 1 true so do nothing
 //			{
 //				garbageRxDataCount++ ;			// TODO: create a buffer and insert garbage datas into it
@@ -145,9 +146,18 @@ void rxDoneEventCallback(uint8_t *payload, uint16_t size, int16_t rssi, int8_t s
 //
 //			vcom_Send("%d;%d;%d;%d;%d:\n", dat.frame.subsec, dat.frame.sec, dat.frame.min,
 //															 dat.frame.hour, dat.frame.sensor);
+	  	  	/**
+	  	  	 * Compare receiver and transmiter time,adc values
+	  	  	 */
+
+	  	  	uint32_t subs_r = 1000 - (int)(time.SubSeconds * 1000 / (time.SecondFraction + 1));
+	  	  	uint32_t ms_s_r = time.Hours * 3600000 + time.Minutes * 60000 + time.Seconds * 1000 + subs_r;
+
 			data_s.ms_s = Buffer[0] | (Buffer[1] << 8) | (Buffer[2] << 16) | (Buffer[3] << 24);
 			data_s.sensor_s = Buffer[4] + (Buffer[5] << 8);
-			vcom_Send("%d,%d\n",dat.frame.subsec, dat.frame.sec, dat.frame.min, data_s.ms_s , data_s.sensor_s);
+	  	  	uint16_t packetCounter = Buffer[6] + (Buffer[7] << 8);
+
+			vcom_Send("[%d]Transmitter : %d,%d Receiver : %d,%d\n",packetCounter, data_s.ms_s, data_s.sensor_s , ms_s_r,databuffer);
 }
 
 
@@ -158,7 +168,6 @@ int main(void)
 	SystemClock_Config();
 	HW_Init();
 	at_hal_init();
-
 
     /* GPIO init for PA11*/
     __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -207,6 +216,8 @@ int main(void)
 
     TimerInit(&ledTimer, ledTimerCallback);
     TimerSetValue(&ledTimer, 500);
+    data_s.packetCount = 0;
+
 //
 //	while(1){
 //		RTC_TimeTypeDef time ;
