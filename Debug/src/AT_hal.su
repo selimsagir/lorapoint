@@ -1,0 +1,8 @@
+AT_hal.c:20:6:HAL_IncTick	8	static
+AT_hal.c:34:6:at_hal_init	8	static
+AT_hal.c:49:27:acquire_systick_value	24	static
+AT_hal.c:84:10:at_hal_nanos	32	static
+AT_hal.c:124:6:at_hal_nanos2	32	static
+AT_hal.c:155:7:at_hal_nanosf	24	static
+AT_hal.c:168:10:at_hal_micros	56	static
+AT_hal.c:181:9:at_hal_millis	8	static
