@@ -17,7 +17,11 @@
 #include "fonts.h"
 #include "ssd1306.h"
 
-
+/* 				 Yapilan Degisiklikler
+ *   1. ADC sampling time deðiþtim böylelikle döngüyü hýzlandýracaðýmý düþünüyorum, pek sonuç vermedi gibi!
+ *
+ *
+ */
 
 static TimerEvent_t ledTimer;
 extern UART_HandleTypeDef UartHandle;
@@ -67,37 +71,53 @@ struct ms_packet{
 static void gpioCallback()
 {
 //	//BSP_LED_On(LED3);
-	uint32_t airtime = 0 ;
+//	uint32_t airtime = 0 ;
 //	UNUSED(airtime);
-    airtime = Radio.TimeOnAir(1, sizeof(data_s));
+//    airtime = Radio.TimeOnAir(1, sizeof(data_s));
 
+	uint64_t times[8];
+
+	times[0] = at_hal_micros();
     databuffer = HW_AdcReadChannel(ADC_CHANNEL_0);
 
-	RTC_TimeTypeDef time ;
-	RTC_DateTypeDef date ;
+	times[1] = at_hal_micros();
+
+	RTC_TimeTypeDef time;
+	RTC_DateTypeDef date;
 	HW_RTC_GetCalendarValue( &date , &time );
+	times[2] = at_hal_micros();
 
 	dat.frame.subsec = (int)(time.SubSeconds * 1000 / (time.SecondFraction + 1));
 	dat.frame.sec = time.Seconds;
 	dat.frame.min = time.Minutes;
 	dat.frame.hour = time.Hours;
 	dat.frame.sensor = databuffer;
+	times[3] = at_hal_micros();
 
 	/*
-	 *  Send Milisecond data for plot ms-data figure
+	 *  1.  Send Milisecond data for plot ms-data figure
+	 *  2.  Calculate ms, subtract from 1000 because of subsec count reverse
+	 *  	Main purpose should be reduce to execute time of this loop I can't get enough resolution for milisecond reading
+	 *  	Decrease to resolution at least 1 ms for precise calculation of time difference between sensors
 	 */
-	/**
-	 *  Calculate ms, subtract from 1000 because of subsec count reverse
-	 */
+
 	data_s.packetCount++;
 	dat.frame.subsec = 1000 - dat.frame.subsec;
 	data_s.ms_s= dat.frame.hour * 3600000 + dat.frame.min * 60000 + dat.frame.sec * 1000 + dat.frame.subsec;
 	data_s.sensor_s = databuffer;
+	times[4] = at_hal_micros();
+
     if(databuffer < 4095)
 		{
 			Radio.Send((uint8_t*)&data_s, (sizeof(data_s)));
+			times[5] = at_hal_micros();
+
 //			PRINTF("%d; %d; %d; %d;%d \n",dat.frame.hour,  dat.frame.min , dat.frame.sec, dat.frame.subsec, dat.frame.sensor);
-			PRINTF("[%d]%d;%d\n",data_s.packetCount, data_s.ms_s, dat.frame.sensor);
+//			PRINTF("[%d]%d\n",data_s.packetCount, dat.frame.sensor);
+//			PRINTF("%d:%d\n",data_s.ms_s  , dat.frame.sensor);//,dat.frame.subsec, dat.frame.sec);
+			PRINTF("%d:%d\n", data_s.ms_s, dat.frame.sensor,data_s.packetCount);
+			times[6] = at_hal_micros();
+
 
 		}
     else
@@ -105,6 +125,8 @@ static void gpioCallback()
     		garbageTxDataCount++;
 
     	}
+    times[7] = at_hal_micros();
+
 
 }
 
@@ -157,7 +179,11 @@ void rxDoneEventCallback(uint8_t *payload, uint16_t size, int16_t rssi, int8_t s
 			data_s.sensor_s = Buffer[4] + (Buffer[5] << 8);
 	  	  	uint16_t packetCounter = Buffer[6] + (Buffer[7] << 8);
 
-			vcom_Send("[%d]Transmitter : %d,%d Receiver : %d,%d\n",packetCounter, data_s.ms_s, data_s.sensor_s , ms_s_r,databuffer);
+		//	vcom_Send("[%d]Transmitter : %d,%d Receiver : %d,%d\n",packetCounter, data_s.ms_s, data_s.sensor_s , ms_s_r,databuffer);
+	  	  	/**
+	  	  	 *  Print ADC data only therefore I should print only data_s.sensor_s
+	  	  	 */
+	  	    vcom_Send("%d:%d\n",data_s.ms_s, data_s.sensor_s);
 }
 
 
